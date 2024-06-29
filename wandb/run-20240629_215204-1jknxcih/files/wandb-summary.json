@@ -1,0 +1,1 @@
+{"examples_seen": 64, "loss": 22.8928165435791, "top1_accuracy": 0.0, "top5_accuracy": 0.015625, "_timestamp": 1719697939.2539346, "_runtime": 14.35125470161438, "_step": 116, "_wandb": {"runtime": 13}}

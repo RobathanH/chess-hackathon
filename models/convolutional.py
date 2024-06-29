@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class Residual(nn.Module):
     """The Residual block of ResNet models."""
     def __init__(self, outer_channels, inner_channels, use_1x1conv=False):

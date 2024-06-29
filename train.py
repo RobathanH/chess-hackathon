@@ -10,11 +10,12 @@ from torch.utils.data import random_split
 from pathlib import Path
 import argparse
 import os
-from model import Model
+from models.transformer2 import Model
 from utils.dataset import HDFDataset
 from torch.utils.data import DataLoader
 import socket
 import yaml
+import wandb
 
 from cycling_utils import (
     InterruptableDistributedSampler,
@@ -24,6 +25,58 @@ from cycling_utils import (
 from utils.LAMB import Lamb
 
 timer.report("Completed imports")
+
+import numpy as np
+square_states = {
+    'empty': 0,
+    'my_pawn': 1, 'my_passant_pawn': 2,
+    'my_virgin_rook': 3, 'my_moved_rook': 4,
+    'my_knight': 5, 'my_ls_bishop': 6, 'my_ds_bishop': 7,
+    'my_queen': 8, 'my_virgin_king': 9, 'my_moved_king': 10,
+    'op_pawn': 11, 'op_passant_pawn': 12,
+    'op_virgin_rook': 13, 'op_moved_rook': 14,
+    'op_knight': 15, 'op_ls_bishop': 16, 'op_ds_bishop': 17,
+    'op_queen': 18, 'op_virgin_king': 19, 'op_moved_king': 20
+}
+
+# Piece values based on standard chess piece values
+piece_values = {
+    'empty': 0,
+    'my_pawn': 1, 'my_passant_pawn': 1,
+    'my_virgin_rook': 5, 'my_moved_rook': 5,
+    'my_knight': 3, 'my_ls_bishop': 3, 'my_ds_bishop': 3,
+    'my_queen': 9, 'my_virgin_king': 0, 'my_moved_king': 0,
+    'op_pawn': -1, 'op_passant_pawn': -1,
+    'op_virgin_rook': -5, 'op_moved_rook': -5,
+    'op_knight': -3, 'op_ls_bishop': -3, 'op_ds_bishop': -3,
+    'op_queen': -9, 'op_virgin_king': 0, 'op_moved_king': 0
+}
+
+# Reverse dictionary for easier lookup
+value_dict = {v: piece_values[k] for k, v in square_states.items()}
+
+def evaluate_board(board):
+    value = 0
+    for row in board:
+        for square in row:
+            value += value_dict[int(square)]
+    return value
+
+def evaluate_moves(moves):
+    """
+    Evaluate a set of possible moves.
+    
+    Parameters:
+    moves (numpy.ndarray): A tensor of shape (N, 8, 8) representing N possible board states.
+    
+    Returns:
+    numpy.ndarray: An array of values of length N representing the evaluation of each board state.
+    """
+    values = np.zeros(len(moves))
+    for i, board in enumerate(moves):
+        values[i] = evaluate_board(board)
+    return values
+
 
 def get_args_parser(add_help=True):
     parser = argparse.ArgumentParser()
@@ -96,8 +149,19 @@ def main(args, timer):
         metrics = checkpoint["metrics"]
         timer.report("Retrieved saved checkpoint")
 
-    grad_accum_steps = 10
-    save_steps = 10
+    grad_accum_steps = 1
+    save_steps = 5
+
+    # start a new wandb run to track this script
+    wandb.init(
+        # set the wandb project where this run will be logged
+        project="chess-bot",
+
+        # track hyperparameters and run metadata
+        config={
+        "epochs": 10,
+        }
+    )
 
     for epoch in range(train_dataloader.sampler.epoch, 10000):
 
@@ -115,8 +179,16 @@ def main(args, timer):
                 is_last_step = (step + 1) == train_steps_per_epoch
 
                 evals = logish_transform(evals) # suspect this might help
+                #print(evals)
+
+                #evals[evals > 0] *= 10
                 boards, evals = boards.to(args.device_id), evals.to(args.device_id)
                 scores = model(boards)
+                #fake_scores = torch.tensor(evaluate_moves(boards)).cuda()
+
+
+                #scores = fake_scores
+
                 loss = loss_fn(scores, evals)
                 loss = loss / grad_accum_steps
                 loss.backward()
@@ -133,6 +205,11 @@ def main(args, timer):
                     "top5_accuracy": 1 if top_eval_index in top5_score_indices else 0
                 })
 
+                #print(_moves.shape)
+                #print(_turns.shape)
+                #print(boards.shape)
+                #print(evals.shape)
+
                 if (step + 1) % grad_accum_steps == 0 or is_last_step:
 
                     optimizer.step()
@@ -144,6 +221,14 @@ def main(args, timer):
                         rpt_loss =rpt["accum_loss"]
                         rpt_top1 = rpt["top1_accuracy"] / rpt["examples_seen"]
                         rpt_top5 = rpt["top5_accuracy"] / rpt["examples_seen"]
+
+                        wandb.log({
+                                "examples_seen": len(evals),
+                                "loss": rpt_loss, 
+                                "top1_accuracy": rpt_top1, 
+                                "top5_accuracy": rpt_top5
+                                })
+
                         print(f"Step {train_dataloader.sampler.progress}, Loss {rpt_loss:,.3f}, Top1 {rpt_top1:,.3f}, Top5 {rpt_top5:,.3f}, Examples: {rpt['examples_seen']:,.0f}")
 
                     metrics["train"].reset_local()
@@ -170,6 +255,8 @@ def main(args, timer):
 
                 with torch.no_grad():
                     for _moves, _turns, boards, evals in test_dataloader:
+
+
 
                         # Determine the current step
                         step = test_dataloader.sampler.progress // test_dataloader.batch_size
@@ -201,7 +288,13 @@ def main(args, timer):
                                 rpt_loss =rpt["accum_loss"] / rpt["examples_seen"]
                                 rpt_top1 = rpt["top1_accuracy"] / rpt["examples_seen"]
                                 rpt_top5 = rpt["top5_accuracy"] / rpt["examples_seen"]
+
+
+
                                 print(f"Epoch {epoch}, Loss {rpt_loss:,.3f}, Top1 {rpt_top1:,.3f}, Top5 {rpt_top5:,.3f}")
+
+
+
 
                             metrics["test"].reset_local()
                         
@@ -218,6 +311,8 @@ def main(args, timer):
                                 },
                                 args.save_chk_path,
                             )
+
+    wandb.finish()
 
 
 timer.report("Defined functions")

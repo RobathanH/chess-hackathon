@@ -36,7 +36,7 @@ class Model(nn.Transformer):
         self.init_weights()
 
     def init_weights(self):
-        initrange = 0.1
+        initrange = 0.5
         nn.init.uniform_(self.input_emb.weight, -initrange, initrange)
         nn.init.uniform_(self.decoder.weight, -initrange, initrange)
 
@@ -44,9 +44,9 @@ class Model(nn.Transformer):
         # print(inputs.shape)
         inputs = inputs.flatten(1)
         # print(inputs.shape)
-        inputs = self.input_emb(inputs) * math.sqrt(self.embed_dim) # (candidate, square, embed)
+        inputs = self.input_emb(inputs) #* math.sqrt(self.embed_dim) # (candidate, square, embed)
         # print(inputs.shape)
-        inputs = self.pos_encoder(inputs) # (candidate, square, embed)
+        #inputs = self.pos_encoder(inputs) # (candidate, square, embed)
         # print(inputs.shape)
         encoded = self.encoder(inputs) # (candidate, square, embed)
         # print(encoded.shape)
