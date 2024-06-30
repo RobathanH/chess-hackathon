@@ -31,7 +31,7 @@ class Model(nn.Transformer):
 
         self.input_emb = nn.Embedding(ntoken, embed_dim)
         self.embed_dim = embed_dim
-        self.decoder = nn.Linear(64 * embed_dim, 1, bias=False)
+        self.decoder = nn.Linear(64 * embed_dim, 1, bias=True)
 
         self.init_weights()
 

@@ -1,0 +1,1 @@
+torchrun --nnodes=1 --nproc-per-node=1 --node_rank=0 train_wandb.py --save-dir out_reltrans --load-dir out_reltrans --lr 0.00005

@@ -81,3 +81,31 @@ class HDFDataset(Dataset):
         return move, turn, board, evaluation
 
     
+class SubsetDataset(Dataset):
+    def __init__(self, dataset, indices):
+        self.dataset = dataset
+        self.index_map = {
+            i: ind
+            for i, ind in enumerate(indices)
+        }
+
+    def __len__(self):
+        return len(self.index_map)
+
+    def __getitem__(self, index):
+        return self.dataset[self.index_map[index]]
+
+class ConcatDataset(Dataset):
+    def __init__(self, *datasets):
+        self.datasets = datasets
+
+    def __len__(self):
+        return sum(len(d) for d in self.datasets)
+
+    def __getitem__(self, index):
+        start_ind = 0
+        dataset_ind = 0
+        while index >= start_ind + len(self.datasets[dataset_ind]):
+            start_ind += len(self.datasets[dataset_ind])
+            dataset_ind += 1
+        return self.datasets[dataset_ind][index - start_ind]

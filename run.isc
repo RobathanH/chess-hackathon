@@ -1,7 +1,8 @@
-isc_project_id = "<isc-project-id>"
-experiment_name = "chess"
+isc_project_id = "b3e5fb6a-28ab-4350-8724-a44b3ee62084"
+compute_mode = "interruptible"
+experiment_name = "chess_reltransformer"
 gpu_type = "24GB VRAM GPU"
 nnodes = 8
-output_path = "~/outputs/chess"
-dataset_id = "<dataset-id>"
-command = "source ~/.chess/bin/activate && cd ~/chess-hackathon/ && torchrun --nnodes=8 --nproc-per-node=6 --master_addr=$MASTER_ADDR --master_port=$MASTER_PORT --node_rank=$RANK train.py --save-dir $OUTPUT_PATH --lr 0.0002 --model-config /root/chess-hackathon/model_config.yaml"
+output_path = "~/rob/chess-hackathon/out"
+dataset_id = "07380c17-2987-4489-a2f4-9fc29d239d55"
+command = "source ~/.chess/bin/activate && cd ~/rob/chess-hackathon/ && torchrun --nnodes=8 --nproc-per-node=6 --master_addr=$MASTER_ADDR --master_port=$MASTER_PORT --node_rank=$RANK train_cluster.py --save-dir $OUTPUT_PATH --lr 0.0001 --model-config /root/chess-hackathon/model_config.yaml"

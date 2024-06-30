@@ -10,7 +10,6 @@ from torch.utils.data import random_split
 from pathlib import Path
 import argparse
 import os
-from model import Model
 from utils.dataset import HDFDataset
 from torch.utils.data import DataLoader
 import socket
@@ -74,7 +73,8 @@ def main(args, timer):
     test_dataloader = DataLoader(test_dataset, batch_size=64, sampler=test_sampler)
     timer.report("Prepared dataloaders")
 
-    model_config = yaml.safe_load(open(args.model_config))
+    model_config = yaml.safe_load(open("models/transformer.yaml"))
+    from models.rel2d_transformer import Model
     model = Model(**model_config)
     model = model.to(args.device_id)
     model = DDP(model, device_ids=[args.device_id])

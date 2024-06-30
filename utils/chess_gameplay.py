@@ -10,6 +10,12 @@ import cairosvg
 import time
 import copy
 
+import __main__ as main
+IS_INTERACTIVE = not hasattr(main, '__file__')
+
+if IS_INTERACTIVE:
+    from IPython.display import display
+
 def softmax_temp(x, temp=1):
     z = np.exp((x - x.max()) / temp)
     return z / z.sum()
@@ -57,6 +63,7 @@ def selector(scores, p=0.3, k=3):
         # so np.log2(float('inf')) = inf
         t = entropy_temperature(scores, target_entropy)
         dist = softmax_temp(scores, temp=t)
+        print(np.sort(dist)[-3:])
         return choices(range(len(scores)), cum_weights=list(accumulate(dist)))[0]
 
 class Agent:
@@ -76,8 +83,10 @@ class Agent:
             # scores = self.model(torch.tensor(options))
 
             # Split the options into individual boards for scoring.
-            individual_boards = [torch.tensor(board) for board in options]
-            scores = [self.model(board).squeeze().item() for board in individual_boards]
+            individual_boards = [torch.tensor(board).unsqueeze(0) for board in options]
+            scores = np.array([self.model(board).item() for board in individual_boards])
+
+            print(scores)
             
         # Select end token
         selection = selector(scores, self.p, self.k)
@@ -176,6 +185,9 @@ def play_game(table, agents, max_moves=float('inf'), min_seconds_per_move=2, ver
 
         # Move is now selected, chs_board and chs_boardsvg now reflects the updated board state. Send to S3
         cairosvg.svg2png(bytestring=chs_boardsvg.encode('utf-8'), write_to="board_temp.png")
+
+        if IS_INTERACTIVE:
+            display(chess.svg.board(chs_board, size=200, orientation=chess.WHITE, borders=False, coordinates=False))
 
         # Add this move to the game_record
         game_result[color_toplay]['moves'].append((selected_board, chs_board, pgn_token, chs_boardsvg))
