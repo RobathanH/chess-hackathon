@@ -13,16 +13,19 @@ class PGNDataset(Dataset):
         zfile = zipfile.ZipFile(pgn_path)
         pgn_files = zfile.namelist()
         for file in pgn_files:
+            print(file)
             pgn = zfile.open(file).readlines()
             pgns[file.split('.')[0]] = pgn
         zfile.close()
 
-        pgn = pgns['Carlsen']
+        pgn = pgns['WorldChamp2023']
+        #pgn = []
         games = []
         chunk = []
         game = []
 
         for line in pgn:
+            print(line)
             line = line.decode()
             if line.strip() == '':
                 game.append(chunk)

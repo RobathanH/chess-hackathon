@@ -12,9 +12,12 @@ import argparse
 import os
 from model import Model
 from utils.dataset import HDFDataset
+from utils.dataset import PGNDataset
 from torch.utils.data import DataLoader
 import socket
 import yaml
+
+import wandb
 
 from cycling_utils import (
     InterruptableDistributedSampler,
@@ -61,8 +64,14 @@ def main(args, timer):
     args.save_chk_path.parent.mkdir(parents=True, exist_ok=True)
     timer.report("Validated checkpoint path")
 
+    # og data
     data_path = "/data"
     dataset = HDFDataset(data_path)
+
+    # # new data
+    # data_path = "/data"
+    # dataset = HDFDataset(data_path)
+
     timer.report("Loaded dataset to RAM")
 
     random_generator = torch.Generator().manual_seed(42)
@@ -96,8 +105,19 @@ def main(args, timer):
         metrics = checkpoint["metrics"]
         timer.report("Retrieved saved checkpoint")
 
-    grad_accum_steps = 10
+    grad_accum_steps = 1
     save_steps = 10
+
+    # start a new wandb run to track this script
+    wandb.init(
+        # set the wandb project where this run will be logged
+        project="chess-bot",
+
+        # track hyperparameters and run metadata
+        config={
+        "epochs": 10,
+        }
+    )
 
     for epoch in range(train_dataloader.sampler.epoch, 10000):
 
@@ -144,6 +164,15 @@ def main(args, timer):
                         rpt_loss =rpt["accum_loss"]
                         rpt_top1 = rpt["top1_accuracy"] / rpt["examples_seen"]
                         rpt_top5 = rpt["top5_accuracy"] / rpt["examples_seen"]
+
+                        wandb.log({
+                                "examples_seen": len(evals),
+                                "loss": rpt_loss, 
+                                "top1_accuracy": rpt_top1, 
+                                "top5_accuracy": rpt_top5
+                                })
+                        
+
                         print(f"Step {train_dataloader.sampler.progress}, Loss {rpt_loss:,.3f}, Top1 {rpt_top1:,.3f}, Top5 {rpt_top5:,.3f}, Examples: {rpt['examples_seen']:,.0f}")
 
                     metrics["train"].reset_local()

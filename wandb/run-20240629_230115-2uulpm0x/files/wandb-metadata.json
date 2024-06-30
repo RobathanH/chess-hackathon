@@ -1,0 +1,215 @@
+{
+    "os": "Linux-5.19.0-50-generic-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "heartbeatAt": "2024-06-29T23:01:16.528976",
+    "startedAt": "2024-06-29T23:01:15.662493",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--save-dir",
+        "./runs",
+        "--lr",
+        "0.0002",
+        "--model-config",
+        "/root/alex/chess-hackathon/model_config.yaml"
+    ],
+    "state": "running",
+    "program": "/root/alex/chess-hackathon/train.py",
+    "codePathLocal": "train.py",
+    "codePath": "train.py",
+    "git": {
+        "remote": "git@github.com:RobathanH/chess-hackathon.git",
+        "commit": "9b4604a274b5a5b72c2ae46469a1da804c8b9799"
+    },
+    "email": "yatsenkoa2020@gmail.com",
+    "root": "/root/alex/chess-hackathon",
+    "host": "212ed18d841c",
+    "username": "root",
+    "executable": "/usr/bin/python3",
+    "cpu_count": 16,
+    "cpu_count_logical": 32,
+    "cpu_freq": {
+        "current": 2446.578968750001,
+        "min": 2200.0,
+        "max": 3900.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2200.0,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2196.841,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2200.0,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2194.936,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2142.539,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 4391.046,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2200.0,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2200.0,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2200.0,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 4390.465,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2196.262,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2194.443,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3570.206,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2094.603,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2200.0,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2200.0,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2200.0,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2195.9,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 4391.489,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2200.0,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2191.644,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 4219.723,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2153.275,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3860.459,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2200.0,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 4391.927,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2196.05,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2195.288,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3563.43,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2200.0,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 2054.505,
+            "min": 2200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 4315.143,
+            "min": 2200.0,
+            "max": 3900.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 1873.6501388549805,
+            "used": 49.54371643066406
+        }
+    },
+    "gpu": "NVIDIA GeForce RTX 3090",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 3090",
+            "memory_total": 25769803776
+        }
+    ],
+    "memory": {
+        "total": 251.53678512573242
+    }
+}

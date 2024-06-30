@@ -1,0 +1,6 @@
+ntoken: 21
+embed_dim: 64
+nhead: 4
+nhid: 24
+nlayers: 6
+batch_first: True
